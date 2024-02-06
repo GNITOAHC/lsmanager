@@ -46,7 +46,7 @@ pub fn download(
             if let Err(e) = curl(&download_url, &destination) {
                 return Err(e);
             }
-            // Extract binary from zip file unzip(destination, zip_file_path, extract_path)
+            // Extract binary from zip file: unzip(destination, zip_file_path, extract_path)
             if let Err(e) = unzip(&path, path.join(&zipname).to_str().unwrap(), &bin_path) {
                 return Err(e);
             }

@@ -12,7 +12,7 @@ use std::path::Path;
  *    - If not, fetch info.yaml into packages/{lang}/info.yaml
  *  2. Read info.yaml
  *  3. Download dependencies (including download executable from package managers)
- *  4. Extract binary (make it executable) and link to bin (change name to package name)
+ *  4. Link executable to bin (change name to package name)
  */
 
 pub fn install(glob: &GlobalData, package: &str) {
@@ -72,7 +72,7 @@ pub fn install(glob: &GlobalData, package: &str) {
         println!("{e}")
     }
 
-    // 4. Extract binary (make it executable) and link to bin (change name to package name)
+    // 4. Link executable to bin (change name to package name)
     match symlink(
         [&glob.get_pkg_path(package), bin_name.as_str()].join(""),
         [&glob.get_bin_path(), deserialized_map.name.as_str()].join(""),

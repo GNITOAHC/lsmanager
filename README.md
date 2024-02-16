@@ -8,7 +8,7 @@ LSManager stands for Language Server Manager, which manages [language servers](h
 
 - Source support
   - [x] GitHub
-  - [ ] Npm
+  - [x] Npm
   - [ ] Pypi
 - OS support
   - [x] MacOS
@@ -30,9 +30,14 @@ LSManager stands for Language Server Manager, which manages [language servers](h
     │   ├── clangd/
     │   │   ├── clangd (bin)
     │   │   └── info.yaml
-    │   └── stylua/
-    │       ├── stylua (bin)
-    │       └── info.yaml
+    │   ├── stylua/
+    │   │   ├── stylua (bin)
+    │   │   └── info.yaml
+    │   └── tailwindcss-language-server/
+    │       ├── package.json
+    │       ├── package-lock.json
+    │       ├── info.yaml
+    │       └── node_modules/
     └── registries/
         └── github/
             ├── info.json (store version of registry.json)
@@ -40,5 +45,6 @@ LSManager stands for Language Server Manager, which manages [language servers](h
 ~/.local/ (or path to binary)
 └── bin/
     ├── stylua -> ~/.local/lsm/packages/sylua/stylua (bin)
-    └── clangd -> ~/.local/lsm/packages/sylua/clangd (bin)
+    ├── clangd -> ~/.local/lsm/packages/sylua/clangd (bin)
+    └── tailwindcss-language-server -> ~/.local/lsm/packages/tailwindcss-language-server/node_modules/.bin/tailwindcss-language-server
 ```

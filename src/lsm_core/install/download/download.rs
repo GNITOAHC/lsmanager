@@ -2,6 +2,7 @@ use super::{github, npm, pypi};
 use crate::global_data::GlobalDataTrait;
 use crate::lsm::commands::{curl::curl, unzip::unzip};
 use crate::lsm_registry;
+use std::collections::HashMap;
 use std::path::Path;
 
 #[derive(Debug)]
@@ -17,8 +18,8 @@ enum PackageSource {
 pub fn download(
     map: &lsm_registry::RegistryStruct,
     glob: &crate::GlobalData,
-    path: &Path,
-) -> Result<String, Box<dyn std::error::Error>> {
+    path: &Path, // Path to `lsm/packages/` directory
+) -> Result<HashMap<String, String>, Box<dyn std::error::Error>> {
     let raw_source = &map.source.id;
     let mut package_source: PackageSource = PackageSource::Undefined;
 
@@ -51,15 +52,25 @@ pub fn download(
                 return Err(e);
             }
             // Return the filename of binary
-            return Ok(bin_path.split('/').last().unwrap().to_string());
+            // HashMap<src, dst>
+            let bin_path_map = HashMap::from([(
+                bin_path.split('/').last().unwrap().to_string(), // src
+                map.name.clone(),                                // dst
+            )]);
+            return Ok(bin_path_map);
         }
         PackageSource::Npm => {
-            npm::handle_npm(&map.source.id, &map.bin);
+            let package = npm::get_package(&map.source.id); // e.g. prettier@3.2.5 or @tailwindcss/language-server@0.0.16
+            let dir = glob.get_pkg_path(&map.name); // Path to `lsm/packages/{lang}/`
+            match npm::handle_npm(&package, &dir, &map.bin) {
+                Ok(bin_path_map) => return Ok(bin_path_map),
+                Err(e) => return Err(e),
+            }
         }
         PackageSource::Pypi => {
             pypi::handle_pypi(&map.source.id);
         }
         _ => return Err("Unknown package source".into()),
     }
-    Ok("".to_string())
+    Ok(HashMap::from([]))
 }

@@ -22,10 +22,13 @@ pub fn install(glob: &GlobalData, package: &str) {
 
     // 1. Make sure package/info.yaml exists in packages/{lang}
     match package_path.exists() {
-        true => println!("package exists"), // Package exists, return
+        true => println!("Package exists"), // Package exists, return
         false => {
             // - If not, fetch info.yaml into packages/{lang}/info.yaml
-            println!("package not exists");
+            println!(
+                "Package not exists, creating directory {} ...",
+                &glob.get_pkg_path(package)
+            );
             // Create package directory
             if let Err(e) = fs::create_dir_all(&glob.get_pkg_path(package)) {
                 println!("Error creating {}", &glob.get_pkg_path(package),);
@@ -56,11 +59,11 @@ pub fn install(glob: &GlobalData, package: &str) {
     // println!("{:?}", deserialized_map);
 
     // 3. Download dependencies (including download executable from package managers)
-    // ::return:: executable name
-    let bin_name = match download(
+    // ::return:: HashMap<String, String> (src of binary, dst name of binary)
+    let bin_name_map = match download(
         &deserialized_map, // Contains info.yaml
         &glob,
-        package_path, // Path to package
+        package_path, // Path to `lsm/packages/`
     ) {
         Ok(name) => name,
         Err(e) => panic!("{e}"),
@@ -73,11 +76,13 @@ pub fn install(glob: &GlobalData, package: &str) {
     }
 
     // 4. Link executable to bin (change name to package name)
-    match symlink(
-        [&glob.get_pkg_path(package), bin_name.as_str()].join(""),
-        [&glob.get_bin_path(), deserialized_map.name.as_str()].join(""),
-    ) {
-        Ok(_) => println!("linked"),
-        Err(e) => println!("{e}"),
+    for (src, dst) in bin_name_map {
+        match symlink(
+            [&glob.get_pkg_path(package), src.as_str()].join(""), // src
+            [&glob.get_bin_path(), dst.as_str()].join(""),        // dst
+        ) {
+            Ok(_) => println!("linked"),
+            Err(e) => println!("{e}"),
+        }
     }
 }

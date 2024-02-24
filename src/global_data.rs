@@ -36,7 +36,11 @@ pub trait GlobalDataTrait {
 
 impl GlobalDataTrait for GlobalData {
     fn new(dir: String, bin: String) -> Self {
-        let home = match env::var("HOME") {
+        let home_env = match std::env::consts::OS {
+            "windows" => "HOMEPATH",
+            _ => "HOME"
+        };
+        let home = match env::var(home_env) {
             Ok(h) => h,
             Err(_) => panic!("$HOME not found"),
         };
@@ -70,8 +74,8 @@ impl GlobalDataTrait for GlobalData {
             OsType::DarwinArm64 => "darwin_arm64".to_string(),
             OsType::LinuxX64 => "linux_x64".to_string(),
             OsType::LinuxArm64 => "linux_arm64".to_string(),
-            OsType::WindowsX64 => "windows_x64".to_string(),
-            OsType::WindowsArm64 => "windows_arm64".to_string(),
+            OsType::WindowsX64 => "win_x64".to_string(),
+            OsType::WindowsArm64 => "win_arm64".to_string(),
         }
     }
 

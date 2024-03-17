@@ -37,7 +37,7 @@ fn get_destination() -> (String, String) {
     match std::env::consts::OS {
         "macos" => ("~/.local/lsm/".to_string(), "~/.local/bin/".to_string()),
         "linux" => ("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
-        "windows" => ("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
+        "windows" => ("~/AppData/Local/lsm/".to_string(), "C:/bin/".to_string()),
         _ => panic!("Unsupported OS"),
     }
 }
@@ -113,6 +113,32 @@ impl GlobalDataTrait for GlobalData {
                 _ => panic!("Unsupported architecture"),
             },
             _ => panic!("Unsupported OS"),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // use crate::global_data::{GlobalData, GlobalDataTrait};
+    // fn trait_tester() {
+    //     let glob = GlobalData::new();
+    // }
+
+    #[test]
+    fn get_destination_test() {
+        let (dir, bin) = get_destination();
+        // assert_eq!(dir, "~/.local/lsm/");
+        // assert_eq!(bin, "~/.local/bin/");
+        if cfg!(target_os = "windows") {
+            assert_eq!(dir, "~/AppData/Local/lsm/");
+            assert_eq!(bin, "C:/bin/");
+        } else if cfg!(target_os = "macos") {
+            assert_eq!(dir, "~/.local/lsm/");
+            assert_eq!(bin, "~/.local/bin/")
+        } else if cfg!(target_os = "linux") {
+        } else {
+            panic!("Unsupported OS");
         }
     }
 }

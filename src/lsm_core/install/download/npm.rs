@@ -2,7 +2,10 @@ use crate::lsm::commands;
 use std::collections::{hash_map::RandomState, HashMap};
 
 fn npm_install(prefix: &str, package: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let command = "npm";
+    let mut command = "npm";
+    if cfg!(target_os = "windows") {
+        command = "npm.cmd";
+    }
     let args = vec!["install", "--prefix", prefix, package];
     match commands::custom::custom(command, &args) {
         Ok(_) => Ok(()),
@@ -29,9 +32,8 @@ pub fn handle_npm(
         return Err(e);
     }
 
-    let pkg_trans = |s: &String| -> String {
-        return format!("./node_modules/.bin/{}", s.replace("npm:", "").trim());
-    };
+    let pkg_trans =
+        |s: &String| -> String { format!("./node_modules/.bin/{}", s.replace("npm:", "").trim()) };
 
     match bins {
         Some(bins) => {
@@ -39,13 +41,11 @@ pub fn handle_npm(
                 .iter()
                 .map(|(key, val)| {
                     // HashMap<src, dst>
-                    return (pkg_trans(val).clone(), key.clone());
+                    (pkg_trans(val).clone(), key.clone())
                 })
                 .collect();
-            return Ok(bin_path_map);
+            Ok(bin_path_map)
         }
-        None => {
-            return Err("No bin found".into());
-        }
+        None => Err("No bin found".into()),
     }
 }

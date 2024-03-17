@@ -1,4 +1,3 @@
-use std::env;
 use std::fmt;
 
 pub struct GlobalData {
@@ -24,7 +23,7 @@ pub enum OsType {
 }
 
 pub trait GlobalDataTrait {
-    fn new(dir_path: String, bin_path: String) -> Self;
+    fn new() -> Self;
     fn get_dir_path(&self) -> &str;
     fn get_pkg_path(&self, pkg: &str) -> String;
     fn get_bin_path(&self) -> &str;
@@ -34,11 +33,28 @@ pub trait GlobalDataTrait {
     fn get_os_type(&self) -> OsType;
 }
 
+fn get_destination() -> (String, String) {
+    match std::env::consts::OS {
+        "macos" => ("~/.local/lsm/".to_string(), "~/.local/bin/".to_string()),
+        "linux" => ("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
+        "windows" => ("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
+        _ => panic!("Unsupported OS"),
+    }
+}
+
+fn get_home() -> Result<String, std::env::VarError> {
+    match std::env::consts::OS {
+        "windows" => std::env::var("HOMEPATH"),
+        _ => std::env::var("HOME"),
+    }
+}
+
 impl GlobalDataTrait for GlobalData {
-    fn new(dir: String, bin: String) -> Self {
-        let home = match env::var("HOME") {
+    fn new() -> Self {
+        let (dir, bin) = get_destination();
+        let home = match get_home() {
             Ok(h) => h,
-            Err(_) => panic!("$HOME not found"),
+            Err(e) => panic!("Error {}", e),
         };
         GlobalData {
             dir_path: dir.replace("~", &home),
@@ -70,8 +86,8 @@ impl GlobalDataTrait for GlobalData {
             OsType::DarwinArm64 => "darwin_arm64".to_string(),
             OsType::LinuxX64 => "linux_x64".to_string(),
             OsType::LinuxArm64 => "linux_arm64".to_string(),
-            OsType::WindowsX64 => "windows_x64".to_string(),
-            OsType::WindowsArm64 => "windows_arm64".to_string(),
+            OsType::WindowsX64 => "win_x64".to_string(),
+            OsType::WindowsArm64 => "win_arm64".to_string(),
         }
     }
 

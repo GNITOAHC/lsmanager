@@ -1,5 +1,3 @@
-use std::env;
-
 mod lsm;
 mod lsm_core;
 mod lsm_registry;
@@ -10,12 +8,13 @@ use global_data::GlobalDataTrait;
 
 fn main() {
     // Detect OS and declare the target path
-    let glob: GlobalData = match env::consts::OS {
-        "macos" => GlobalData::new("~/.local/lsm/".to_string(), "~/.local/bin/".to_string()),
-        "linux" => GlobalData::new("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
-        "windows" => GlobalData::new("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
-        _ => panic!("Unsupported OS"),
-    };
+    let glob = GlobalData::new();
+    // let glob: GlobalData = match env::consts::OS {
+    //     "macos" => GlobalData::new("~/.local/lsm/".to_string(), "~/.local/bin/".to_string()),
+    //     "linux" => GlobalData::new("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
+    //     "windows" => GlobalData::new("./.local/lsm/".to_string(), "./.local/bin/".to_string()),
+    //     _ => panic!("Unsupported OS"),
+    // };
 
     // let file = match std::fs::File::open("./target/tmp.yaml") {
     //     Ok(file) => file,

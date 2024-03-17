@@ -23,13 +23,13 @@ fn unzip_unzip(
         .spawn()?;
 
     match process_stdout(&mut child) {
-        Ok(_) => return Ok(()),
-        Err(e) => return Err(e),
+        Ok(_) => Ok(()),
+        Err(e) => Err(e),
     }
 }
 
 fn unzip_gzip(zip_file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
-    // gzip -d [file] -c > [destination]
+    // gzip -d [file]
     // e.g. gzip -d rust-analyzer/rust-analyzer-aarch64-apple-darwin.gz
     let mut child = Command::new("gzip")
         .arg("-d")
@@ -37,8 +37,8 @@ fn unzip_gzip(zip_file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
         .stdout(Stdio::piped())
         .spawn()?;
     match process_stdout(&mut child) {
-        Ok(_) => return chmod(&zip_file_path.replace(".gz", ""), "+x"),
-        Err(e) => return Err(e),
+        Ok(_) => chmod(&zip_file_path.replace(".gz", ""), "+x"),
+        Err(e) => Err(e),
     }
 }
 
@@ -62,7 +62,7 @@ fn chmod(file_path: &str, flag: &str) -> Result<(), Box<dyn std::error::Error>> 
         .spawn()?;
 
     match process_stdout(&mut child) {
-        Ok(_) => return Ok(()),
-        Err(e) => return Err(e),
+        Ok(_) => Ok(()),
+        Err(e) => Err(e),
     }
 }

@@ -49,5 +49,5 @@ pub fn handle_github(
         source, version, zipname
     );
     println!("{}", download_url);
-    return (download_url, zipname);
+    (download_url, zipname)
 }

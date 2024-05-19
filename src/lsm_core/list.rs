@@ -7,7 +7,8 @@ use std::path::Path;
 fn list_dir(path: &Path) -> () {
     for entry in fs::read_dir(path).unwrap() {
         let entry = entry.unwrap();
-        println!("entry path display: {}", entry.path().display());
+        let display: String = entry.path().into_os_string().into_string().unwrap();
+        println!("{}", display.split("/").last().unwrap())
     }
 }
 
@@ -19,6 +20,7 @@ pub fn list(glob: &GlobalData) -> () {
                 println!("No packages installed");
                 return;
             }
+            println!("Installed packages: (located in {}/packages)", &glob.get_dir_path());
             list_dir(Path::new(&[&glob.get_dir_path(), "/packages"].join("")))
         }
         // Create new directory if not exists
